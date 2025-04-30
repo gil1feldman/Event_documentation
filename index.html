@@ -109,11 +109,7 @@
     <form id="eventForm">
       <label for="eventSelect">בחר אירוע מהרשימה:</label>
       <select id="eventSelect" required>
-        <option value="">— בחר אירוע —</option>
-        <option value="אירוע א">אירוע א</option>
-        <option value="אירוע ב">אירוע ב</option>
-        <option value="אירוע ג">אירוע ג</option>
-        <!-- בהמשך נטען מגוגל -->
+        <option value="">— טוען אירועים... —</option>
       </select>
 
       <label for="referenceLink">קישור להתייחסות:</label>
@@ -128,6 +124,28 @@
       <button type="submit">שלח</button>
     </form>
   </div>
+
+  <script>
+    const eventSelect = document.getElementById("eventSelect");
+
+    fetch("https://script.google.com/macros/s/AKfycbyZTgGthd4UVHZkVDOf1DQ4KurfQKn651hgRit5Yk7P1wp2NsZmMay1i48nZuirSk73/exec")
+      .then(response => response.json())
+      .then(events => {
+        // נקה את האפשרות הראשונה
+        eventSelect.innerHTML = '<option value="">— בחר אירוע —</option>';
+        // הוסף את האירועים מהשרת
+        events.forEach(event => {
+          const option = document.createElement("option");
+          option.value = event;
+          option.textContent = event;
+          eventSelect.appendChild(option);
+        });
+      })
+      .catch(error => {
+        console.error("שגיאה בטעינת רשימת האירועים:", error);
+        eventSelect.innerHTML = '<option disabled>אירעה שגיאה בטעינה</option>';
+      });
+  </script>
 
 </body>
 </html>
