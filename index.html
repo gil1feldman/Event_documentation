@@ -126,60 +126,61 @@
   </div>
 
   <script>
-    // טוען את רשימת האירועים הדינמית
-    const eventSelect = document.getElementById("eventSelect");
+    document.addEventListener("DOMContentLoaded", function () {
+      const eventSelect = document.getElementById("eventSelect");
+      const form = document.getElementById("eventForm");
 
-    fetch("https://script.google.com/macros/s/AKfycbyZTgGthd4UVHZkVDOf1DQ4KurfQKn651hgRit5Yk7P1wp2NsZmMay1i48nZuirSk73/exec")
-      .then(response => response.json())
-      .then(events => {
-        eventSelect.innerHTML = '<option value="">— בחר אירוע —</option>';
-        events.forEach(event => {
-          const option = document.createElement("option");
-          option.value = event;
-          option.textContent = event;
-          eventSelect.appendChild(option);
+      // שלב 1: טעינת רשימת האירועים מהגיליון
+      fetch("https://script.google.com/macros/s/AKfycbyZTgGthd4UVHZkVDOf1DQ4KurfQKn651hgRit5Yk7P1wp2NsZmMay1i48nZuirSk73/exec")
+        .then(response => response.json())
+        .then(events => {
+          eventSelect.innerHTML = '<option value="">— בחר אירוע —</option>';
+          events.forEach(event => {
+            const option = document.createElement("option");
+            option.value = event;
+            option.textContent = event;
+            eventSelect.appendChild(option);
+          });
+        })
+        .catch(error => {
+          console.error("שגיאה בטעינת רשימת האירועים:", error);
+          eventSelect.innerHTML = '<option disabled>אירעה שגיאה בטעינה</option>';
         });
-      })
-      .catch(error => {
-        console.error("שגיאה בטעינת רשימת האירועים:", error);
-        eventSelect.innerHTML = '<option disabled>אירעה שגיאה בטעינה</option>';
-      });
 
-    // שליחה לגיליון
-    const form = document.getElementById("eventForm");
+      // שלב 2: שליחה של המידע לטופס בגוגל
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
 
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
+        const event = eventSelect.value;
+        const link = document.getElementById("referenceLink").value.trim();
+        const name = document.getElementById("nameInput").value.trim();
+        const time = document.getElementById("referenceTime").value;
 
-      const event = document.getElementById("eventSelect").value;
-      const link = document.getElementById("referenceLink").value.trim();
-      const name = document.getElementById("nameInput").value.trim();
-      const time = document.getElementById("referenceTime").value;
+        if (!event || !link || !name || !time) {
+          alert("אנא מלא את כל השדות הנדרשים.");
+          return;
+        }
 
-      if (!event || !link || !name || !time) {
-        alert("אנא מלא את כל השדות הנדרשים.");
-        return;
-      }
+        const formData = new URLSearchParams();
+        formData.append("event", event);
+        formData.append("link", link);
+        formData.append("name", name);
+        formData.append("time", time);
 
-      const formData = new URLSearchParams();
-      formData.append("event", event);
-      formData.append("link", link);
-      formData.append("name", name);
-      formData.append("time", time);
-
-      fetch("https://script.google.com/macros/s/AKfycbxuSQuwfXkfPZl8opHXqHcn5LvThsc-_Fr6e8flil0Z-8FQrIulmwS8yE7I0UfrD0Yw/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: formData.toString()
-      })
-      .then(response => response.text())
-      .then(result => {
-        alert("המידע נשלח בהצלחה!");
-        form.reset();
-      })
-      .catch(error => {
-        console.error("שגיאה בשליחה:", error);
-        alert("אירעה שגיאה בשליחה. נסה שוב.");
+        fetch("https://script.google.com/macros/s/AKfycbxuSQuwfXkfPZl8opHXqHcn5LvThsc-_Fr6e8flil0Z-8FQrIulmwS8yE7I0UfrD0Yw/exec", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: formData.toString()
+        })
+        .then(response => response.text())
+        .then(result => {
+          alert("המידע נשלח בהצלחה!");
+          form.reset();
+        })
+        .catch(error => {
+          console.error("שגיאה בשליחה:", error);
+          alert("אירעה שגיאה בשליחה. נסה שוב.");
+        });
       });
     });
   </script>
