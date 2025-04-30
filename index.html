@@ -141,13 +141,16 @@
   </div>
 
   <script>
+    const EVENT_LIST_URL = "https://script.google.com/macros/s/AKfycbz_zGLTaZU6_u474pJnLfBuJz4Dh4zTncpJpNhR7L2GYzqChX-OPMoqa1ATbKidSAnz/exec";
+    const EVENT_SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxjhQjYYJaF6MkBP26QCwW6Kyaf0fH08bz_98tzONswtgp0Nhs3JlcSjAWa7pVJc1c/exec";
+
     document.addEventListener("DOMContentLoaded", function () {
       const eventSelect = document.getElementById("eventSelect");
       const form = document.getElementById("eventForm");
       const submitButton = document.getElementById("submitButton");
 
-      // שלב 1: טעינת רשימת האירועים מהגיליון
-      fetch("https://script.google.com/macros/s/AKfycbyZTgGthd4UVHZkVDOf1DQ4KurfQKn651hgRit5Yk7P1wp2NsZmMay1i48nZuirSk73/exec")
+      // שלב 1: טעינת רשימת האירועים
+      fetch(EVENT_LIST_URL)
         .then(response => response.json())
         .then(events => {
           eventSelect.innerHTML = '<option value="">— בחר אירוע —</option>';
@@ -157,13 +160,47 @@
             option.textContent = event;
             eventSelect.appendChild(option);
           });
+
+          const addNewOption = document.createElement("option");
+          addNewOption.value = "__add_new__";
+          addNewOption.textContent = "➕ הוסף אירוע חדש";
+          eventSelect.appendChild(addNewOption);
         })
         .catch(error => {
           console.error("שגיאה בטעינת רשימת האירועים:", error);
           eventSelect.innerHTML = '<option disabled>אירעה שגיאה בטעינה</option>';
         });
 
-      // שלב 2: שליחה של המידע לגיליון
+      // שלב 2: הוספת אירוע חדש
+      eventSelect.addEventListener("change", function () {
+        if (eventSelect.value === "__add_new__") {
+          const newEvent = prompt("הכנס שם אירוע חדש:");
+          if (newEvent && newEvent.trim() !== "") {
+            const formData = new URLSearchParams();
+            formData.append("newEvent", newEvent.trim());
+
+            fetch(EVENT_LIST_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: formData.toString()
+            })
+            .then(response => response.text())
+            .then(() => {
+              alert("האירוע נוסף בהצלחה!");
+              location.reload();
+            })
+            .catch(error => {
+              console.error("שגיאה בהוספת אירוע:", error);
+              alert("אירעה שגיאה בעת הוספת האירוע.");
+              eventSelect.value = "";
+            });
+          } else {
+            eventSelect.value = "";
+          }
+        }
+      });
+
+      // שלב 3: שליחת הטופס הרגילה
       form.addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -183,11 +220,10 @@
         formData.append("name", name);
         formData.append("time", time);
 
-        // הצגת ספינר ונעילת הכפתור
         submitButton.disabled = true;
         submitButton.innerHTML = '<span class="spinner"></span> שולח...';
 
-        fetch("https://script.google.com/macros/s/AKfycbxjhQjYYJaF6MkBP26QCwW6Kyaf0fH08bz_98tzONswtgp0Nhs3JlcSjAWa7pVJc1c/exec", {
+        fetch(EVENT_SUBMIT_URL, {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: formData.toString()
