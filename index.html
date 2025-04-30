@@ -1,51 +1,163 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-  <meta charset="UTF-8">
-  <title>טופס בדיקה</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>תיעוד התייחסות לאירועים חשובים</title>
+  <style>
+    html, body, h2 {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      direction: rtl;
+      background: linear-gradient(to right, #eef2f3, #8dc6ff);
+      display: flex;
+      justify-content: center;
+      padding: 0 20px 20px;
+    }
+
+    .container {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      width: 100%;
+      max-width: 500px;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      color: #0A3D91;
+      margin-bottom: 30px;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    label {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 12px 0 8px;
+      display: block;
+      color: #333;
+      text-align: right;
+    }
+
+    select, input {
+      display: block;
+      width: 90%;
+      max-width: 400px;
+      margin: 0 auto 20px auto;
+      padding: 12px 14px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: #f9f9f9;
+      transition: all 0.3s ease;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    select {
+      direction: rtl;
+    }
+
+    select:focus, input:focus {
+      border-color: #0A3D91;
+      background-color: #eef6ff;
+      outline: none;
+      box-shadow: 0 0 5px rgba(10, 61, 145, 0.3);
+    }
+
+    button {
+      background: linear-gradient(to right, #0A3D91, #2E8BFF);
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      width: 90%;
+      max-width: 400px;
+      margin: 10px auto 0 auto;
+      display: block;
+      transition: background 0.3s ease;
+    }
+
+    button:disabled {
+      background: #a0b9dd;
+      cursor: not-allowed;
+    }
+
+    button:hover:enabled {
+      background: linear-gradient(to right, #08306b, #1c6ce5);
+    }
+  </style>
 </head>
-<body style="direction: rtl; font-family: sans-serif; padding: 40px; max-width: 500px; margin: auto; background: #f0f4f8;">
+<body>
 
-  <h2>טופס שליחה לבדיקה</h2>
+  <div class="container">
+    <h2>תיעוד התייחסות לאירועים חשובים</h2>
 
-  <form id="eventForm">
-    <label>אירוע:
+    <form id="eventForm">
+      <label for="eventSelect">בחר אירוע מהרשימה:</label>
       <select id="eventSelect" required>
-        <option value="">בחר אירוע</option>
-        <option value="אירוע בדיקה 1">אירוע בדיקה 1</option>
-        <option value="אירוע בדיקה 2">אירוע בדיקה 2</option>
+        <option value="">— טוען אירועים... —</option>
       </select>
-    </label><br>
 
-    <label>קישור:
-      <input type="url" id="referenceLink" required>
-    </label><br>
+      <label for="referenceLink">קישור להתייחסות:</label>
+      <input type="url" id="referenceLink" placeholder="https://example.com" required>
 
-    <label>שם:
-      <input type="text" id="nameInput" required>
-    </label><br>
+      <label for="nameInput">שם מוסיף ההתייחסות:</label>
+      <input type="text" id="nameInput" placeholder="שם פרטי ומשפחה" required>
 
-    <label>זמן:
+      <label for="referenceTime">זמן ההתייחסות:</label>
       <input type="datetime-local" id="referenceTime" required>
-    </label><br><br>
 
-    <button type="submit">שלח</button>
-  </form>
+      <button type="submit">שלח</button>
+    </form>
+  </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", function () {
+      const eventSelect = document.getElementById("eventSelect");
       const form = document.getElementById("eventForm");
 
-      form.addEventListener("submit", e => {
+      // שלב 1: טעינת רשימת האירועים מהגיליון
+      fetch("https://script.google.com/macros/s/AKfycbyZTgGthd4UVHZkVDOf1DQ4KurfQKn651hgRit5Yk7P1wp2NsZmMay1i48nZuirSk73/exec")
+        .then(response => response.json())
+        .then(events => {
+          eventSelect.innerHTML = '<option value="">— בחר אירוע —</option>';
+          events.forEach(event => {
+            const option = document.createElement("option");
+            option.value = event;
+            option.textContent = event;
+            eventSelect.appendChild(option);
+          });
+        })
+        .catch(error => {
+          console.error("שגיאה בטעינת רשימת האירועים:", error);
+          eventSelect.innerHTML = '<option disabled>אירעה שגיאה בטעינה</option>';
+        });
+
+      // שלב 2: שליחה של המידע לגיליון
+      form.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const event = document.getElementById("eventSelect").value;
-        const link = document.getElementById("referenceLink").value;
-        const name = document.getElementById("nameInput").value;
+        const event = eventSelect.value;
+        const link = document.getElementById("referenceLink").value.trim();
+        const name = document.getElementById("nameInput").value.trim();
         const time = document.getElementById("referenceTime").value;
 
         if (!event || !link || !name || !time) {
-          alert("נא למלא את כל השדות");
+          alert("אנא מלא את כל השדות הנדרשים.");
           return;
         }
 
@@ -55,22 +167,19 @@
         formData.append("name", name);
         formData.append("time", time);
 
-        console.log("שולח נתונים...", formData.toString());
-
-        fetch("https://script.google.com/macros/s/AKfycbxuSQuwfXkfPZl8opHXqHcn5LvThsc-_Fr6e8flil0Z-8FQrIulmwS8yE7I0UfrD0Yw/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbxjhQjYYJaF6MkBP26QCwW6Kyaf0fH08bz_98tzONswtgp0Nhs3JlcSjAWa7pVJc1c/exec", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: formData.toString()
         })
-        .then(res => res.text())
-        .then(resText => {
-          console.log("תגובה מהשרת:", resText);
-          alert("נשלח בהצלחה!");
+        .then(response => response.text())
+        .then(result => {
+          alert("המידע נשלח בהצלחה!");
           form.reset();
         })
-        .catch(err => {
-          console.error("שגיאה בשליחה:", err);
-          alert("שגיאה בשליחה. ראה קונסול.");
+        .catch(error => {
+          console.error("שגיאה בשליחה:", error);
+          alert("אירעה שגיאה בשליחה. נסה שוב.");
         });
       });
     });
