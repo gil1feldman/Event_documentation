@@ -1,65 +1,133 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>תיעוד התייחסות לאירועים חשובים</title>
   <style>
+    html, body, h2 {
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       direction: rtl;
-      padding: 20px;
-      max-width: 800px;
-      margin: auto;
+      background: linear-gradient(to right, #eef2f3, #8dc6ff);
+      display: flex;
+      justify-content: center;
+      padding: 0 20px 20px;
+    }
+
+    .container {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      width: 100%;
+      max-width: 500px;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     h2 {
+      color: #0A3D91;
+      margin-bottom: 30px;
+      font-size: 28px;
       text-align: center;
     }
 
     label {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 12px 0 8px;
       display: block;
-      margin-bottom: 10px;
-      font-size: 16px;
+      color: #333;
+      text-align: right;
     }
 
-    select, input, button {
-      width: 100%;
-      padding: 8px;
+    select, input {
+      display: block;
+      width: 90%;
+      max-width: 400px;
+      margin: 0 auto 20px auto;
+      padding: 12px 14px;
       font-size: 16px;
-      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: #f9f9f9;
+      transition: all 0.3s ease;
+      text-align: center;
       box-sizing: border-box;
     }
 
+    select {
+      direction: rtl;
+    }
+
+    select:focus, input:focus {
+      border-color: #0A3D91;
+      background-color: #eef6ff;
+      outline: none;
+      box-shadow: 0 0 5px rgba(10, 61, 145, 0.3);
+    }
+
     button {
+      background: linear-gradient(to right, #0A3D91, #2E8BFF);
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
       cursor: pointer;
+      font-size: 18px;
+      width: 90%;
+      max-width: 400px;
+      margin: 10px auto 0 auto;
+      display: block;
+      transition: background 0.3s ease;
+    }
+
+    button:disabled {
+      background: #a0b9dd;
+      cursor: not-allowed;
+    }
+
+    button:hover:enabled {
+      background: linear-gradient(to right, #08306b, #1c6ce5);
     }
   </style>
 </head>
 <body>
 
-  <h2>תיעוד התייחסות לאירועים חשובים</h2>
+  <div class="container">
+    <h2>תיעוד התייחסות לאירועים חשובים</h2>
 
-  <form id="eventForm">
-    <label for="eventSelect">בחר אירוע מהרשימה:</label>
-    <select id="eventSelect" required>
-      <option value="" disabled selected>בחר אירוע</option>
-      <option value="אירוע א">אירוע א</option>
-      <option value="אירוע ב">אירוע ב</option>
-      <option value="אירוע ג">אירוע ג</option>
-      <!-- בעתיד נטען רשימה זו מגוגל -->
-    </select>
+    <form id="eventForm">
+      <label for="eventSelect">בחר אירוע מהרשימה:</label>
+      <select id="eventSelect" required>
+        <option value="">— בחר אירוע —</option>
+        <option value="אירוע א">אירוע א</option>
+        <option value="אירוע ב">אירוע ב</option>
+        <option value="אירוע ג">אירוע ג</option>
+        <!-- בהמשך נטען מגוגל -->
+      </select>
 
-    <label for="referenceLink">קישור להתייחסות:</label>
-    <input type="url" id="referenceLink" placeholder="https://example.com" required>
+      <label for="referenceLink">קישור להתייחסות:</label>
+      <input type="url" id="referenceLink" placeholder="https://example.com" required>
 
-    <label for="nameInput">שם מוסיף ההתייחסות:</label>
-    <input type="text" id="nameInput" placeholder="שם פרטי ומשפחה" required>
+      <label for="nameInput">שם מוסיף ההתייחסות:</label>
+      <input type="text" id="nameInput" placeholder="שם פרטי ומשפחה" required>
 
-    <label for="referenceTime">זמן ההתייחסות:</label>
-    <input type="datetime-local" id="referenceTime" required>
+      <label for="referenceTime">זמן ההתייחסות:</label>
+      <input type="datetime-local" id="referenceTime" required>
 
-    <button type="submit">שלח</button>
-  </form>
+      <button type="submit">שלח</button>
+    </form>
+  </div>
 
 </body>
 </html>
